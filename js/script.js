@@ -3,8 +3,28 @@
 const header = document.querySelector('#header');
 const menuButton = document.querySelector('.menu-button');
 const nav = document.querySelector('#nav');
+let lastScrollPosition = window.scrollY;
+const scrollDirectionThreshold = 6;
 
-const setHeaderState = () => header.classList.toggle('is-scrolled', window.scrollY > 24);
+const setHeaderState = () => {
+  const currentScrollPosition = window.scrollY;
+  const isAtTop = currentScrollPosition <= 24;
+  const scrollDifference = currentScrollPosition - lastScrollPosition;
+
+  header.classList.toggle('is-scrolled', !isAtTop);
+
+  if (isAtTop || nav.classList.contains('is-open')) {
+    header.classList.remove('is-hidden');
+  } else if (scrollDifference > scrollDirectionThreshold) {
+    header.classList.add('is-hidden');
+  } else if (scrollDifference < -scrollDirectionThreshold) {
+    header.classList.remove('is-hidden');
+  }
+
+  if (Math.abs(scrollDifference) > scrollDirectionThreshold || isAtTop) {
+    lastScrollPosition = Math.max(currentScrollPosition, 0);
+  }
+};
 setHeaderState();
 window.addEventListener('scroll', setHeaderState, { passive: true });
 
